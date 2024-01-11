@@ -1,9 +1,5 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
 import { graphql } from "@keystone-6/core";
-import { jsx } from "@keystone-ui/core";
 import React, {
-  lazy,
   type HTMLAttributes,
   type ReactElement,
   type ReactNode,
@@ -193,10 +189,13 @@ export const fields = {
   }): FormFieldWithGraphQLField<string, undefined> {
     return {
       kind: "form",
-      Input(props) {
-        const Component = React.lazy(() => import("./views/TextInput"));
-        return <Component {...props} label={label} />;
-      },
+      Input:
+        typeof window !== "undefined"
+          ? (props) => {
+              const Component = React.lazy(() => import("./views/TextInput"));
+              return React.createElement(Component, { ...props, label });
+            }
+          : () => null,
       options: undefined,
       defaultValue,
       validate(value) {
@@ -220,10 +219,19 @@ export const fields = {
     };
     return {
       kind: "form",
-      Input(props) {
-        const Component = lazy(() => import("./views/IntegerInput"));
-        return <Component {...props} label={label} validate={validate} />;
-      },
+      Input:
+        typeof window !== "undefined"
+          ? (props) => {
+              const Component = React.lazy(
+                () => import("./views/IntegerInput")
+              );
+              return React.createElement(Component, {
+                ...props,
+                label,
+                validate,
+              });
+            }
+          : () => null,
       options: undefined,
       defaultValue,
       validate,
@@ -245,10 +253,17 @@ export const fields = {
     };
     return {
       kind: "form",
-      Input(props) {
-        const Component = lazy(() => import("./views/URLInput"));
-        return <Component {...props} label={label} validate={validate} />;
-      },
+      Input:
+        typeof window !== "undefined"
+          ? (props) => {
+              const Component = React.lazy(() => import("./views/URLInput"));
+              return React.createElement(Component, {
+                ...props,
+                label,
+                validate,
+              });
+            }
+          : () => null,
       options: undefined,
       defaultValue,
       validate,
@@ -275,10 +290,17 @@ export const fields = {
     }
     return {
       kind: "form",
-      Input(props) {
-        const Component = lazy(() => import("./views/SelectInput"));
-        return <Component {...props} label={label} options={options} />;
-      },
+      Input:
+        typeof window !== "undefined"
+          ? (props) => {
+              const Component = React.lazy(() => import("./views/SelectInput"));
+              return React.createElement(Component, {
+                ...props,
+                label,
+                options,
+              });
+            }
+          : () => null,
       options,
       defaultValue,
       validate(value) {
@@ -308,10 +330,19 @@ export const fields = {
     const valuesToOption = new Map(options.map((x) => [x.value, x]));
     return {
       kind: "form",
-      Input(props) {
-        const Component = lazy(() => import("./views/MultiSelectInput"));
-        return <Component {...props} label={label} options={options} />;
-      },
+      Input:
+        typeof window !== "undefined"
+          ? (props) => {
+              const Component = React.lazy(
+                () => import("./views/MultiSelectInput")
+              );
+              return React.createElement(Component, {
+                ...props,
+                label,
+                options,
+              });
+            }
+          : () => null,
       options,
       defaultValue,
       validate(value) {
@@ -343,10 +374,15 @@ export const fields = {
   }): FormFieldWithGraphQLField<boolean, undefined> {
     return {
       kind: "form",
-      Input(props) {
-        const Component = lazy(() => import("./views/CheckboxInput"));
-        return <Component {...props} label={label} />;
-      },
+      Input:
+        typeof window !== "undefined"
+          ? (props) => {
+              const Component = React.lazy(
+                () => import("./views/CheckboxInput")
+              );
+              return React.createElement(Component, { ...props, label });
+            }
+          : () => null,
       options: undefined,
       defaultValue,
       validate(value) {
@@ -361,10 +397,13 @@ export const fields = {
   empty(): FormField<null, undefined> {
     return {
       kind: "form",
-      Input() {
-        const Component = lazy(() => import("./views/EmptyInput"));
-        return <Component />;
-      },
+      Input:
+        typeof window !== "undefined"
+          ? () => {
+              const Component = React.lazy(() => import("./views/EmptyInput"));
+              return React.createElement(Component);
+            }
+          : () => null,
       options: undefined,
       defaultValue: null,
       validate(value) {
@@ -725,11 +764,12 @@ export function component<
 export const NotEditable = ({
   children,
   ...props
-}: HTMLAttributes<HTMLDivElement>) => (
-  <span css={{ userSelect: "none" }} contentEditable={false} {...props}>
-    {children}
-  </span>
-);
+}: HTMLAttributes<HTMLDivElement>) =>
+  React.createElement(
+    "span",
+    { style: { userSelect: "none" }, contentEditable: false, ...props },
+    children
+  );
 
 type Comp<Props> = (props: Props) => ReactElement | null;
 
